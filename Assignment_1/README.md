@@ -1,4 +1,4 @@
-* Assignment One
+# Assignment One
 
 This assignment is to use basic local search techniques to find a global
 maximum on a small plane. The maximum is known, meaning this assingment is just
@@ -17,7 +17,7 @@ Both the mapping and mutation options are passed on the command line.
 
 The basic algorithm is as follows:
 
-'''
+```
 initialize random number generator
 initialize W
 for( i = 1; i < 10000; i++ ) {
@@ -25,7 +25,7 @@ for( i = 1; i < 10000; i++ ) {
      if( fitness(W') > fitness(W) )
      	 W = W'
 }
-'''
+```
 
 Each of the six possible combinations will be run 1000 times with each random
 starting point being given 10,000 cycles to find the maximum. With this data
