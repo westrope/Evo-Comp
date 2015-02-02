@@ -30,6 +30,8 @@ int main( int argc, char* argv[] ) {
     exit( -1 );
   }
 
+  // convert arguments to integers
+  // might not catch bad strings :(
   int arg1 = atoi( argv[1] );
   int arg2 = atoi( argv[2] );
 
@@ -55,6 +57,16 @@ int main( int argc, char* argv[] ) {
     exit( -1 );
   }
 
+  // call functions
+  if( arg1 == 0 ) {
+    // call gray code function
+  } else if( arg1 == 1 ) {
+    // call binary function
+  } else {
+    cout << "Bad arguments" << endl;
+    exit(-1);
+  }
+
   // init random variable
   initRand();
   unsigned long long int startLocation;
@@ -67,4 +79,55 @@ int main( int argc, char* argv[] ) {
   cout << x << endl;
 
   cout << bitset<64>(startLocation & mask) << endl;
+}
+
+
+void grayLoop( int arg2 ) {
+  // init Random number generator
+  initRand();
+
+  // init start location
+  unsigned long long int curLocation;
+  unsigned long long int newLocation;
+  // start 1000 loop here
+  curLocation = randULL();
+
+  int bestFit = fitness( curLocation );
+  for( int i = 0; i < 10000; i++ ) {
+    newLocation = mutate( arg2, curLocation );
+    if( fitness( newLocation ) > bestFit ) {
+      curLocation = newLocation;
+      bestFit = fitness(newLocation);
+    }
+  }
+}
+
+void binLoop( int arg2 ) {
+  // init Random number generator
+  initRand();
+
+  // init start location
+  unsigned long long int curLocation;
+  unsigned long long int newLocation;
+  // start 1000 loop here
+  curLocation = randULL();
+
+  int bestFit = fitness( curLocation );
+  for( int i = 0; i < 10000; i++ ) {
+    newLocation = mutate( arg2, curLocation );
+    if( fitness( newLocation ) > bestFit ) {
+      curLocation = newLocation;
+      bestFit = fitness(newLocation);
+    }
+  }
+}
+
+unsigned long long int mutate( int arg2, unsigned long long int curLocation ) {
+
+
+}
+
+int fitness( unsigned long long int location ) {
+
+
 }
