@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <bitset>
 
 #include "bitHelpers.h"
 #include "rand.h"
@@ -54,8 +55,16 @@ int main( int argc, char* argv[] ) {
     exit( -1 );
   }
 
+  // init random variable
+  initRand();
+  unsigned long long int startLocation;
+  startLocation = randULL();
 
-  
-  cout << "Test makefile" << endl;
+  unsigned long long int mask  = 15;
 
+  std::bitset<64> x(startLocation);
+
+  cout << x << endl;
+
+  cout << bitset<64>(startLocation & mask) << endl;
 }
