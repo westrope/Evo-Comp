@@ -30,4 +30,4 @@ Bit64 bitRotateRight(Bit64 n, int amount);
 Bit64 bitParity(Bit64 n);
 Bit64 rightMask(Bit64 n);
 
-#endif;
+#endif

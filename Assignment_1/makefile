@@ -1,21 +1,30 @@
 # It is important to note that what looks like leading sets of blanks
 # are in fact tabs and MUST BE TABS.  Make is just that way.
 #
-SRCS = rand.cpp
-HDRS = rand.h
-OBJS = rand.o
-LIBS = -lm
+SRC= rand.cpp bitHelpers.cpp localsearch.cpp makefile
+HDRS= rand.h bitHelpers.h
+LIBS= -lm
 CC=g++
-CPPFLAGS = -g -Wall
-CPPFLAGS = -O3
+CFLAGS= -o
+PFLAGS= -g -c -O3
 
 
-localsearch: localsearch.o $(OBJS)
-	$(CC) $(CPPFLAGS) localsearch.o $(OBJS) $(LIBS) -o localsearch
+
+localsearch: localsearch.o rand.o bitHelpers.o
+	$(CC) $(CFLAGS) localsearch localsearch.o rand.o bitHelpers.o 
+
+localsearch.o: localsearch.cpp
+	$(CC) $(PFLAGS) localsearch.cpp 
+
+rand.o: rand.cpp rand.h
+	$(CC) $(PFLAGS) rand.cpp 
+
+bitHelpers.o: bitHelpers.cpp bitHelpers.h
+	$(CC) $(PFLAGS) bitHelpers.cpp 
 
 clean:
 	rm -f *.o *~
 
 tar:
-	tar -cvf pas1.tar $(SRCS) $(HDRS)  makefile localsearch.cpp 
+	tar -cvf pas1.tar $(SRC) $(HDRS)
 	ls -l pas1.tar
