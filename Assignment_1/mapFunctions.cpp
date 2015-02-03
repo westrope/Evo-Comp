@@ -1,3 +1,5 @@
+#include "mapFunctions.h"
+
 // map value from [low1, high2] -> [low2, high2]
 //
 double map(double value, double low1, double high1, double low2, double high2) {

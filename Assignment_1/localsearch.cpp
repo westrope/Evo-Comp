@@ -12,20 +12,15 @@
 
 #include "bitHelpers.h"
 #include "rand.h"
+#include "mapFunctions.h"
 
 unsigned long long int mutate( int arg1, int arg2, unsigned long long int curLocation );
+double fitness( int arg1, unsigned long long int location );
 
 using namespace std;
 
 int main( int argc, char* argv[] ) {
 
-  // variables for command line arguments
-  int grayFlag = 0;     // Gray code
-  int binaryFlag = 0;
-  int randomFlag = 0;
-  int bitFlag = 0;
-  int incFlag = 0;      // increment decrement mutation
-  
   // check if there are the correct number of arguments
   if( argc > 3 || argc < 3 ) {
     cout << "Two arguments required" << endl;
@@ -38,49 +33,32 @@ int main( int argc, char* argv[] ) {
   int arg2 = atoi( argv[2] );
 
   // get first argument
-  if( arg1 == 0 ) {
-    grayFlag = 1;
-  } else if( arg1 == 1 ) {
-    binaryFlag = 1;
-  } else {
+  if( arg1 != 0 && arg1 != 1 ) {
     cout << "First argument must be a 0 or 1" << endl;
     exit( -1 );
   }
 
   // get second argument
-  if( arg2 == 0 ) {
-    randomFlag = 1;
-  } else if( arg2 == 1 ) {
-    bitFlag = 1;
-  } else if( arg2 == 2 ) {
-    incFlag = 1;
-  } else {
+  if( arg2 != 0 && arg2 != 1 && arg2 != 2 ) {
     cout << "Second argument must be a 0, 1, or 2" << endl;
     exit( -1 );
   }
 
-  // call functions
-  if( arg1 == 0 ) {
-    // call gray code function
-  } else if( arg1 == 1 ) {
-    // call binary function
-  } else {
-    cout << "Bad arguments" << endl;
-    exit(-1);
-  }
+  
 
   // init random variable
   initRand();
   unsigned long long int startLocation;
   startLocation = randULL();
 
-
+  double fit;
   std::bitset<64> x(startLocation);
-
+  fit = fitness( arg1, startLocation );
   cout << x << endl;
-
+  cout << fit << endl;
   startLocation = mutate( arg1, arg2, startLocation );
-  
+  fit = fitness( arg1, startLocation );
+  cout << fit << endl;
   cout << bitset<64>(startLocation) << endl;
 }
 
@@ -187,9 +165,36 @@ unsigned long long int mutate( int arg1, int arg2, unsigned long long int curLoc
  
 }
 
-/*
-int fitness( unsigned long long int location ) {
+
+double fitness( int arg1, unsigned long long int location ) {
+
+  double xmap, ymap, fit;
+  unsigned long long int x, y, tmp, mask;
+  tmp = location;
+  mask = (1<<10) - 1;
+
+  switch( arg1 ) {
+  case 0:
+    x = ( tmp & mask );
+    y = ( (tmp>>10 ) & mask );
+    x = bitDeGray( x );
+    y = bitDeGray( y );
+    xmap = map( x, 0, 1023, 0.0, 10.0 );
+    ymap = map( y, 0, 1023, -10.0, 10.0 );
+    fit = ( 1.0 ) / ( ((xmap - 1.0) * (xmap - 1.0)) + ((ymap - 3.0) * (ymap - 3.0)) + 1.0);
+    return fit;
+  case 1:
+    x = ( tmp & mask );
+    y = ( (tmp>>10 ) & mask );
+    xmap = map( x, 0, 1023, 0.0, 10.0 );
+    ymap = map( y, 0, 1023, -10.0, 10.0 );
+    fit = ( 1.0 ) / ( ((xmap - 1.0) * (xmap - 1.0)) + ((ymap - 3.0) * (ymap - 3.0)) + 1.0);
+    return fit;
+  default:
+    cout << "Bad argument." << endl;
+    exit( -1 );
+  }
 
 
 }
-*/
+
