@@ -13,6 +13,8 @@
 #include "bitHelpers.h"
 #include "rand.h"
 
+unsigned long long int mutate( int arg1, int arg2, unsigned long long int curLocation );
+
 using namespace std;
 
 int main( int argc, char* argv[] ) {
@@ -72,13 +74,14 @@ int main( int argc, char* argv[] ) {
   unsigned long long int startLocation;
   startLocation = randULL();
 
-  unsigned long long int mask  = 15;
 
   std::bitset<64> x(startLocation);
 
   cout << x << endl;
 
-  cout << bitset<64>(startLocation & mask) << endl;
+  startLocation = mutate( arg1, arg2, startLocation );
+  
+  cout << bitset<64>(startLocation) << endl;
 }
 
 /*
@@ -127,6 +130,14 @@ unsigned long long int mutate( int arg1, int arg2, unsigned long long int curLoc
 
   unsigned long long int tmp;
 
+  // array for bit flipping
+  unsigned long long int bitFlip[20] = { 1, 2, 4, 8, 16,
+					 32, 64, 128, 256, 512,
+					 1024, 2048, 4096, 8192, 16384,
+					 32768, 65536, 131072, 262144, 524288 };
+
+  int flip;
+  
   // random mutation
   if( arg2 == 0 ) {
     tmp = randULL();
@@ -134,7 +145,10 @@ unsigned long long int mutate( int arg1, int arg2, unsigned long long int curLoc
 
     // bit flip mutation
   } else if( arg2 == 1 ) {
-    // do bit flip mutate
+    flip = randMod( 20 );
+    tmp = bitFlip[flip];
+    tmp = ( curLocation ^ tmp );
+    return tmp;
 
     // inc/dec gray code mutation
   } else if( arg2 == 2 && arg1 == 0 ) {
@@ -150,9 +164,12 @@ unsigned long long int mutate( int arg1, int arg2, unsigned long long int curLoc
     exit(-1);
   }
 
+ 
 }
 
+/*
 int fitness( unsigned long long int location ) {
 
 
 }
+*/
