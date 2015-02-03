@@ -81,7 +81,7 @@ int main( int argc, char* argv[] ) {
   cout << bitset<64>(startLocation & mask) << endl;
 }
 
-
+/*
 void grayLoop( int arg2 ) {
   // init Random number generator
   initRand();
@@ -121,9 +121,34 @@ void binLoop( int arg2 ) {
     }
   }
 }
+*/
 
-unsigned long long int mutate( int arg2, unsigned long long int curLocation ) {
+unsigned long long int mutate( int arg1, int arg2, unsigned long long int curLocation ) {
 
+  unsigned long long int tmp;
+
+  // random mutation
+  if( arg2 == 0 ) {
+    tmp = randULL();
+    return tmp;
+
+    // bit flip mutation
+  } else if( arg2 == 1 ) {
+    // do bit flip mutate
+
+    // inc/dec gray code mutation
+  } else if( arg2 == 2 && arg1 == 0 ) {
+    // do inc/dec mutate gray code
+
+    // inc/dec bin code mutation
+  } else if( arg2 == 2 && arg1 == 1 ) {
+    // do inc/dec mutate binary code
+
+    // catch bad arguments
+  } else {
+    cout << "Bad arugments" << endl;
+    exit(-1);
+  }
 
 }
 
