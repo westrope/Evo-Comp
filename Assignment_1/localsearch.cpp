@@ -14,8 +14,9 @@
 #include "rand.h"
 #include "mapFunctions.h"
 
-unsigned long long int mutate( int arg1, int arg2, unsigned long long int curLocation );
+unsigned long long int mutate( int arg2, unsigned long long int curLocation );
 double fitness( int arg1, unsigned long long int location );
+void mainLoop( int arg1, int arg2 );
 
 using namespace std;
 
@@ -44,67 +45,34 @@ int main( int argc, char* argv[] ) {
     exit( -1 );
   }
 
-  
-
   // init random variable
   initRand();
-  unsigned long long int startLocation;
-  startLocation = randULL();
 
-  double fit;
-  std::bitset<64> x(startLocation);
-  fit = fitness( arg1, startLocation );
-  cout << x << endl;
-  cout << fit << endl;
-  startLocation = mutate( arg1, arg2, startLocation );
-  fit = fitness( arg1, startLocation );
-  cout << fit << endl;
-  cout << bitset<64>(startLocation) << endl;
+  for( int i = 0; i < 1000; i++ ) {
+    mainLoop( arg1, arg2 );
+  }
+
 }
 
-/*
-void grayLoop( int arg2 ) {
-  // init Random number generator
-  initRand();
-
-  // init start location
-  unsigned long long int curLocation;
-  unsigned long long int newLocation;
-  // start 1000 loop here
+void mainLoop( int arg1, int arg2 ){
+  unsigned long long int curLocation, tmp;
   curLocation = randULL();
+  double curFit, tmpFit;
+  curFit = fitness( arg1, curLocation );
 
-  int bestFit = fitness( curLocation );
   for( int i = 0; i < 10000; i++ ) {
-    newLocation = mutate( arg2, curLocation );
-    if( fitness( newLocation ) > bestFit ) {
-      curLocation = newLocation;
-      bestFit = fitness(newLocation);
+    tmp = mutate( arg2, curLocation );
+    if( (tmpFit = fitness( arg1, tmp )) > curFit ) {
+      curLocation = tmp;
+      curFit = tmpFit;
     }
   }
+
+  cout << curFit << endl;
+
 }
 
-void binLoop( int arg2 ) {
-  // init Random number generator
-  initRand();
-
-  // init start location
-  unsigned long long int curLocation;
-  unsigned long long int newLocation;
-  // start 1000 loop here
-  curLocation = randULL();
-
-  int bestFit = fitness( curLocation );
-  for( int i = 0; i < 10000; i++ ) {
-    newLocation = mutate( arg2, curLocation );
-    if( fitness( newLocation ) > bestFit ) {
-      curLocation = newLocation;
-      bestFit = fitness(newLocation);
-    }
-  }
-}
-*/
-
-unsigned long long int mutate( int arg1, int arg2, unsigned long long int curLocation ) {
+unsigned long long int mutate( int arg2, unsigned long long int curLocation ) {
 
   unsigned long long int tmp;
   unsigned long long int x, y, mask;
@@ -160,11 +128,8 @@ unsigned long long int mutate( int arg1, int arg2, unsigned long long int curLoc
     } else {
     cout << "Bad arugments" << endl;
     exit( -1 );
-  }
-
- 
+  } 
 }
-
 
 double fitness( int arg1, unsigned long long int location ) {
 
@@ -194,7 +159,5 @@ double fitness( int arg1, unsigned long long int location ) {
     cout << "Bad argument." << endl;
     exit( -1 );
   }
-
-
 }
 
