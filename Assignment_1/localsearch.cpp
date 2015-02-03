@@ -129,14 +129,10 @@ void binLoop( int arg2 ) {
 unsigned long long int mutate( int arg1, int arg2, unsigned long long int curLocation ) {
 
   unsigned long long int tmp;
+  unsigned long long int x, y, mask;
+  int flip, incDec;
 
-  // array for bit flipping
-  unsigned long long int bitFlip[20] = { 1, 2, 4, 8, 16,
-					 32, 64, 128, 256, 512,
-					 1024, 2048, 4096, 8192, 16384,
-					 32768, 65536, 131072, 262144, 524288 };
-
-  int flip;
+  mask = ( 1<<10 ) - 1;
   
   // random mutation
   if( arg2 == 0 ) {
@@ -146,14 +142,44 @@ unsigned long long int mutate( int arg1, int arg2, unsigned long long int curLoc
     // bit flip mutation
   } else if( arg2 == 1 ) {
     flip = randMod( 20 );
-    tmp = bitFlip[flip];
+    tmp = ( 1<<flip );
     tmp = ( curLocation ^ tmp );
     return tmp;
 
     // inc/dec gray code mutation
+    // need to extract and then degray each number then gray them before putting them
+    // back together
   } else if( arg2 == 2 && arg1 == 0 ) {
-    // do inc/dec mutate gray code
-
+    tmp = bitDeGray( curLocation );
+    x = ( tmp & mask );
+    y = ( ( tmp>>10 ) & mask );
+    incDec = randMod( 4 );
+    switch( incDec ) {
+    case 0:
+      x += 1;
+      x = ( x & 1023 );
+      break;
+    case 1:
+      x -= 1;
+      x = ( x & 1023 );
+      break;
+    case 2:
+      y += 1;
+      y = ( y & 1023 );
+      break;
+    case 3:
+      y -= 1;
+      y = ( y & 1023 );
+      break;
+    default:
+      cout << "Bad random number" << endl;
+      exit(-1);
+    }
+    tmp = ( ( tmp<<10 ) | y );
+    tmp = ( ( tmp<<10 ) | x );
+    tmp = bitGray( tmp );
+    return tmp;
+   
     // inc/dec bin code mutation
   } else if( arg2 == 2 && arg1 == 1 ) {
     // do inc/dec mutate binary code
@@ -161,7 +187,7 @@ unsigned long long int mutate( int arg1, int arg2, unsigned long long int curLoc
     // catch bad arguments
   } else {
     cout << "Bad arugments" << endl;
-    exit(-1);
+    exit( -1 );
   }
 
  
