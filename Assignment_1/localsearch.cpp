@@ -149,8 +149,8 @@ unsigned long long int mutate( int arg1, int arg2, unsigned long long int curLoc
     // inc/dec gray code mutation
     // need to extract and then degray each number then gray them before putting them
     // back together
-  } else if( arg2 == 2 && arg1 == 0 ) {
-    tmp = bitDeGray( curLocation );
+  } else if( arg2 == 2 ) {
+    tmp = curLocation;
     x = ( tmp & mask );
     y = ( ( tmp>>10 ) & mask );
     incDec = randMod( 4 );
@@ -177,15 +177,9 @@ unsigned long long int mutate( int arg1, int arg2, unsigned long long int curLoc
     }
     tmp = ( ( tmp<<10 ) | y );
     tmp = ( ( tmp<<10 ) | x );
-    tmp = bitGray( tmp );
     return tmp;
-   
-    // inc/dec bin code mutation
-  } else if( arg2 == 2 && arg1 == 1 ) {
-    // do inc/dec mutate binary code
 
-    // catch bad arguments
-  } else {
+    } else {
     cout << "Bad arugments" << endl;
     exit( -1 );
   }
