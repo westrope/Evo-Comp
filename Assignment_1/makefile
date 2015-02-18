@@ -1,7 +1,7 @@
 # It is important to note that what looks like leading sets of blanks
 # are in fact tabs and MUST BE TABS.  Make is just that way.
 #
-SRC= rand.cpp bitHelpers.cpp localsearch.cpp mapFunctions.cpp makefile
+SRC= rand.cpp bitHelpers.cpp localsearch.cpp mapFunctions.cpp makefile westrope.pdf
 HDRS= rand.h bitHelpers.h mapFunctions.h
 LIBS= -lm
 CC=g++

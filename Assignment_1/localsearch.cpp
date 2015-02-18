@@ -55,20 +55,33 @@ int main( int argc, char* argv[] ) {
 }
 
 void mainLoop( int arg1, int arg2 ){
-  unsigned long long int curLocation, tmp;
+  int evalNum, movNum;
+  unsigned long long int curLocation, tmp, x, y, mask;
   curLocation = randULL();
-  double curFit, tmpFit;
+  double curFit, tmpFit, xmap, ymap;
   curFit = fitness( arg1, curLocation );
-
+  movNum = 0;
+  mask = ( 1<<10 ) - 1;
+  
   for( int i = 0; i < 10000; i++ ) {
     tmp = mutate( arg2, curLocation );
     if( (tmpFit = fitness( arg1, tmp )) > curFit ) {
       curLocation = tmp;
       curFit = tmpFit;
+      evalNum = i;
+      movNum++;
     }
   }
 
-  cout << curFit << endl;
+  x = ( curLocation & mask );
+  y = ( ( curLocation>>10 ) & mask );
+  if( arg1 == 0 ) {
+    x = bitDeGray( x );
+    y = bitDeGray( y );
+  }
+  xmap = map( x, 0, 1023, 0.0, 10.0 );
+  ymap = map( y, 0, 1023, -10.0, 10.0 );  
+  cout << evalNum << " " << movNum << " " << xmap << " " << ymap << " " << curFit << endl;
 
 }
 
