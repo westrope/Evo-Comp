@@ -1,0 +1,31 @@
+\documentclass[12pt]{article}
+\author{Ian Westrope}
+\title{Evolutionary Computation Homework One}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+For out first homework we had to try and answer a few questions. First we had
+to find the set of points that gave the best answer to the fitness equation given in the homework. But this isn't really too hard since we know what the best points are already (1, 3). The real questions we wanted to answer were how does the way you store your data and the mutation operators you use on that data affect your results.
+
+
+
+\section{Methods}
+To store our x and y coordinates we used an unsigned long long int and we used the last 20 bits. 10 for x and 10 for y. The points were either stored as Gray code or as normal binary. Three different mutation options where used. Random, where the old points were tossed aside and a new random point was found. Bit flipping, where one of the 20 bits was flipped randomly. And increment/decrement, where either the x or y value had one added to or subtracted from. We then used a simple localsearch and the given fitness equation to see if we could find the best point. In total there were six expirimenets.
+
+\section{Conclusions}
+The first expiriment was Gray code with a random mutation. It had a mean fitness of .99 which is good, but it had a mean of 4939 as the number of times through the loop it took to find the best point.Binary with random mutation produced about the same results. Gray code with bit flipping had a mean fitness of 1 and a mean of 129 times through the loop to find the best point, this is much faster than with the random mutation. Where binary with bit flipping had a mean fitness of .57 which means half the time it didn't even find the best point. Gray code with the increment/decrement mutation had a mean fitness of .06 so it almost never found maximum. Where binary with increment/decrement had a mean fitness of 1 and a mean of 1971 times through the loop to find the best point.
+
+From these results we can see that a random mutation can find the maximum if given enough time, but if we really want to find the maximum fast we should use Gray code with bit flipping or binary with increment/decrement. The reason Gray code didn't handle increment/decrement well was because we didn't de-Gray the values before adding or subtracting one so we weren't actually adding or subtracting one to the value it was representing. And the reason binary didn't perform well with bit flipping is most of the time you need to flip more than one bit to get to the number right next to you so flipping one bit made big jumps.
+
+The different expirments had different landscapes. The ones with high fitness had a landscape that was pretty smooth with one hill in it. But the ones with worse fitness had landscapes that were much more rough and they would get stuck on their local maximum never finding the global maximum.
+
+
+
+
+\end{document}
+
+
