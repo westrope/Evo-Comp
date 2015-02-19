@@ -20,11 +20,18 @@
 #define MAX 100
 #define MIN -100
 
+
+
+
 double mutate( int arg, double val );
 void mainLoop( int arg1, double arg2, double arg3 );
 bool accept( double newf, double f, double temp );
 
 using namespace std;
+
+random_device rd;
+mt19937 gen( rd() );
+uniform_real_distribution<double> dis( -0.1, 0.1 );
 
 int main( int argc, char* argv[] ) {
 
@@ -65,15 +72,17 @@ int main( int argc, char* argv[] ) {
 
   // testing
   initRand();
-   double lower_bound = 0;
-   double upper_bound = 10000;
-  
-   double a_random_double = dis( gen );
-   cout << a_random_double << endl;
+  for( int i = 0; i < 100; i++ ) {
+    mainLoop( arg1, arg2, arg3 );
+  }
+
 }
 
+// arg1 = mutation
+// arg2 = temp
+// arg3 = cooling constant
 void mainLoop( int arg1, double arg2, double arg3 ){
-  double x, y, nx, ny, bestFit, newFit;
+  double x, y, nx, ny, bestFit, newFit, curFit, bestx, besty, rate;
   int epoch, epochImproves;
 
   // init random number generator
@@ -82,16 +91,16 @@ void mainLoop( int arg1, double arg2, double arg3 ){
   mt19937 gen( rd() );
 
   // set x and y to random values
-  x = dis( gen );
-  y = dis( gen );
+  bestx = x = dis( gen );
+  besty = y = dis( gen );
 
   // 200 runs before adjusting temp
   epoch = 200;
 
   // calculate fitness here
-  bestFit = fr( x, y );
+  curFit = bestFit = fr( x, y );
   
-  for( int i = 0; i < 100000; i++ ) {
+  for( int i = 0; i < 100000; ) {
     // Number of improving moves in current epoch
     epochImproves = 0;
 
@@ -100,9 +109,34 @@ void mainLoop( int arg1, double arg2, double arg3 ){
       nx = mutate( arg1, x );
       ny = mutate( arg1, y );
 
-      
+      // new fitness
+      newFit = fr( nx, ny );
+
+      // new eval
+      i++;
+
+      // check if we accept new values
+      if( accept( newFit, curFit, arg2 ) ) {
+	epochImproves++;
+	x = nx;
+	y = ny;
+	curFit = newFit;
+	
+	if( curFit > bestFit ) {
+	  bestx = x;
+	  besty = y;
+	  bestFit = curFit;
+	}
+      }
+    }
+    rate = epochImproves / epoch;
+    if( arg3 < 1 ) {
+      if( rate > 0.9 ) arg2 *= arg3; // make it cooler
+      if( rate < 0.1 ) arg2 /= arg3; // make it hotter
     }
   }
+  // print results
+  cout << "Best Fitness: " << bestFit << endl;
 }
 
 bool accept( double newf, double f, double temp ) {
@@ -114,9 +148,6 @@ double mutate( int arg, double val ) {
 
   switch( arg ) {
   case 0: {
-    random_device rd;
-    mt19937 gen( rd() );
-    uniform_real_distribution<double> dis( -0.1, 0.1 );
     nval = dis( gen );
     nval += val;
     return nval;
