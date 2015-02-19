@@ -10,8 +10,8 @@ PFLAGS= -g -c -O3
 
 
 
-localsearch: localsearch.o rand.o bitHelpers.o mapFunctions.o func.o
-	$(CC) $(CFLAGS) localsearch localsearch.o rand.o bitHelpers.o mapFunctions.o func.o
+sa: localsearch.o rand.o bitHelpers.o mapFunctions.o func.o
+	$(CC) $(CFLAGS) sa localsearch.o rand.o bitHelpers.o mapFunctions.o func.o
 
 localsearch.o: localsearch.cpp
 	$(CC) $(PFLAGS) localsearch.cpp 

@@ -8,169 +8,102 @@
 
 #include <iostream>
 #include <cstdlib>
-#include <bitset>
+#include <random>
 
 #include "bitHelpers.h"
 #include "rand.h"
 #include "mapFunctions.h"
+#include "func.h"
 
-unsigned long long int mutate( int arg2, unsigned long long int curLocation );
-double fitness( int arg1, unsigned long long int location );
-void mainLoop( int arg1, int arg2 );
+// max and min values for x and y
+#define MAX 100
+#define MIN -100
+
+double mutate( int arg, double val );
+void mainLoop( int arg1, double arg2, double arg3 );
 
 using namespace std;
 
 int main( int argc, char* argv[] ) {
 
   // check if there are the correct number of arguments
-  if( argc > 3 || argc < 3 ) {
-    cout << "Two arguments required" << endl;
+  // number of arguments should be 4
+  // 0 == self
+  // 1 == mutation type integer, 0 == uniform, 1 == normal, 2 == Cauchy
+  // 2 == starting temp float greater than 0
+  // 3 == cooling constant float between 0 and 1
+  if( argc != 4 ) {
+    cout << "Three arguments required" << endl;
     exit( -1 );
   }
 
   // convert arguments to integers
   // might not catch bad strings :(
   int arg1 = atoi( argv[1] );
-  int arg2 = atoi( argv[2] );
+  double arg2 = atof( argv[2] );
+  double arg3 = atof( argv[3] );
 
-  // get first argument
-  if( arg1 != 0 && arg1 != 1 ) {
-    cout << "First argument must be a 0 or 1" << endl;
+  // check if first argument is correct
+  if( arg1 != 0 && arg1 != 1  && arg1 != 2 ) {
+    cout << "First argument must be a 0, 1, or 2" << endl;
     exit( -1 );
   }
 
-  // get second argument
-  if( arg2 != 0 && arg2 != 1 && arg2 != 2 ) {
-    cout << "Second argument must be a 0, 1, or 2" << endl;
+  // check if second argument is correct
+  if( arg2 <= 0 ) {
+    cout << "Second argument must be greater than 0" << endl;
     exit( -1 );
   }
 
-  // init random variable
+  // check if third argument is correct
+  if( arg3 <= 0 || arg3 > 1 ) {
+    cout << "Third argument must be greather than 0, but less than or equal to 1" << endl;
+    exit( -1 );
+  }
+
+  // testing
   initRand();
-
-  for( int i = 0; i < 1000; i++ ) {
-    mainLoop( arg1, arg2 );
-  }
-
+   double lower_bound = 0;
+   double upper_bound = 10000;
+   uniform_real_distribution<double> dis(lower_bound,upper_bound);
+   random_device rd;
+   mt19937 gen( rd() );
+   double a_random_double = dis( gen );
+   cout << a_random_double << endl;
 }
 
-void mainLoop( int arg1, int arg2 ){
-  int evalNum, movNum;
-  unsigned long long int curLocation, tmp, x, y, mask;
-  curLocation = randULL();
-  double curFit, tmpFit, xmap, ymap;
-  curFit = fitness( arg1, curLocation );
-  movNum = 0;
-  mask = ( 1<<10 ) - 1;
-  
-  for( int i = 0; i < 10000; i++ ) {
-    tmp = mutate( arg2, curLocation );
-    if( (tmpFit = fitness( arg1, tmp )) > curFit ) {
-      curLocation = tmp;
-      curFit = tmpFit;
-      evalNum = i;
-      movNum++;
-    }
+void mainLoop( int arg1, double arg2, double arg3 ){
+  double x, y;
+  for( int i = 0; i < 100000; i++ ) {
+    
   }
+}
+ 
+double mutate( int arg, double val ) {
+  double nval;
 
-  x = ( curLocation & mask );
-  y = ( ( curLocation>>10 ) & mask );
-  if( arg1 == 0 ) {
-    x = bitDeGray( x );
-    y = bitDeGray( y );
+  switch( arg ) {
+  case 0: {
+    random_device rd;
+    mt19937 gen( rd() );
+    uniform_real_distribution<double> dis( -0.1, 0.1 );
+    nval = dis( gen );
+    nval += val;
+    return nval;
   }
-  xmap = map( x, 0, 1023, 0.0, 10.0 );
-  ymap = map( y, 0, 1023, -10.0, 10.0 );  
-  cout << evalNum << " " << movNum << " " << xmap << " " << ymap << " " << curFit << endl;
-
-}
-
-unsigned long long int mutate( int arg2, unsigned long long int curLocation ) {
-
-  unsigned long long int tmp;
-  unsigned long long int x, y, mask;
-  int flip, incDec;
-
-  mask = ( 1<<10 ) - 1;
-  
-  // random mutation
-  if( arg2 == 0 ) {
-    tmp = randULL();
-    return tmp;
-
-    // bit flip mutation
-  } else if( arg2 == 1 ) {
-    flip = randMod( 20 );
-    tmp = ( 1<<flip );
-    tmp = ( curLocation ^ tmp );
-    return tmp;
-
-    // inc/dec gray code mutation
-    // need to extract and then degray each number then gray them before putting them
-    // back together
-  } else if( arg2 == 2 ) {
-    tmp = curLocation;
-    x = ( tmp & mask );
-    y = ( ( tmp>>10 ) & mask );
-    incDec = randMod( 4 );
-    switch( incDec ) {
-    case 0:
-      x += 1;
-      x = ( x & 1023 );
-      break;
-    case 1:
-      x -= 1;
-      x = ( x & 1023 );
-      break;
-    case 2:
-      y += 1;
-      y = ( y & 1023 );
-      break;
-    case 3:
-      y -= 1;
-      y = ( y & 1023 );
-      break;
-    default:
-      cout << "Bad random number" << endl;
-      exit(-1);
-    }
-    tmp = ( ( tmp<<10 ) | y );
-    tmp = ( ( tmp<<10 ) | x );
-    return tmp;
-
-    } else {
-    cout << "Bad arugments" << endl;
-    exit( -1 );
-  } 
-}
-
-double fitness( int arg1, unsigned long long int location ) {
-
-  double xmap, ymap, fit;
-  unsigned long long int x, y, tmp, mask;
-  tmp = location;
-  mask = (1<<10) - 1;
-
-  switch( arg1 ) {
-  case 0:
-    x = ( tmp & mask );
-    y = ( (tmp>>10 ) & mask );
-    x = bitDeGray( x );
-    y = bitDeGray( y );
-    xmap = map( x, 0, 1023, 0.0, 10.0 );
-    ymap = map( y, 0, 1023, -10.0, 10.0 );
-    fit = ( 1.0 ) / ( ((xmap - 1.0) * (xmap - 1.0)) + ((ymap - 3.0) * (ymap - 3.0)) + 1.0);
-    return fit;
-  case 1:
-    x = ( tmp & mask );
-    y = ( (tmp>>10 ) & mask );
-    xmap = map( x, 0, 1023, 0.0, 10.0 );
-    ymap = map( y, 0, 1023, -10.0, 10.0 );
-    fit = ( 1.0 ) / ( ((xmap - 1.0) * (xmap - 1.0)) + ((ymap - 3.0) * (ymap - 3.0)) + 1.0);
-    return fit;
-  default:
-    cout << "Bad argument." << endl;
+  case 1: {
+    nval = randNorm( 0.1 );
+    nval += val;
+    return nval;
+  }
+  case 2: {
+    nval = randCauchy( 0, 0.1 );
+    nval += val;
+    return nval;
+  }
+  default: {
+    cout << "Unexpected error in mutate function." << endl;
     exit( -1 );
   }
+  }
 }
-
