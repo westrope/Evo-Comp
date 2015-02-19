@@ -9,6 +9,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <random>
+#include <complex>
 
 #include "bitHelpers.h"
 #include "rand.h"
@@ -21,6 +22,7 @@
 
 double mutate( int arg, double val );
 void mainLoop( int arg1, double arg2, double arg3 );
+bool accept( double newf, double f, double temp );
 
 using namespace std;
 
@@ -71,7 +73,7 @@ int main( int argc, char* argv[] ) {
 }
 
 void mainLoop( int arg1, double arg2, double arg3 ){
-  double x, y, nx, ny, bestFit;
+  double x, y, nx, ny, bestFit, newFit;
   int epoch, epochImproves;
 
   // init random number generator
@@ -87,6 +89,8 @@ void mainLoop( int arg1, double arg2, double arg3 ){
   epoch = 200;
 
   // calculate fitness here
+  bestFit = fr( x, y );
+  
   for( int i = 0; i < 100000; i++ ) {
     // Number of improving moves in current epoch
     epochImproves = 0;
@@ -99,6 +103,10 @@ void mainLoop( int arg1, double arg2, double arg3 ){
       
     }
   }
+}
+
+bool accept( double newf, double f, double temp ) {
+  return ( newf >= f ) || ( randUnit() < exp( (newf - f) / temp ) ); 
 }
  
 double mutate( int arg, double val ) {
