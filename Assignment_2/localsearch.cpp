@@ -65,17 +65,39 @@ int main( int argc, char* argv[] ) {
   initRand();
    double lower_bound = 0;
    double upper_bound = 10000;
-   uniform_real_distribution<double> dis(lower_bound,upper_bound);
-   random_device rd;
-   mt19937 gen( rd() );
+  
    double a_random_double = dis( gen );
    cout << a_random_double << endl;
 }
 
 void mainLoop( int arg1, double arg2, double arg3 ){
-  double x, y;
+  double x, y, nx, ny, bestFit;
+  int epoch, epochImproves;
+
+  // init random number generator
+  uniform_real_distribution<double> dis( MIN, MAX);
+  random_device rd;
+  mt19937 gen( rd() );
+
+  // set x and y to random values
+  x = dis( gen );
+  y = dis( gen );
+
+  // 200 runs before adjusting temp
+  epoch = 200;
+
+  // calculate fitness here
   for( int i = 0; i < 100000; i++ ) {
-    
+    // Number of improving moves in current epoch
+    epochImproves = 0;
+
+    for( int j = 0; j < epoch; j++ ) {
+      // get new values
+      nx = mutate( arg1, x );
+      ny = mutate( arg1, y );
+
+      
+    }
   }
 }
  

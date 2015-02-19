@@ -1,5 +1,6 @@
 *~
 *.o
 localsearch
+sa
 *.tar
 *.pdf
