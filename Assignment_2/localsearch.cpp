@@ -8,8 +8,9 @@
 
 #include <iostream>
 #include <cstdlib>
-#include <random>
+// #include <random>
 #include <complex>
+#include <ctime>
 
 #include "bitHelpers.h"
 #include "rand.h"
@@ -20,18 +21,21 @@
 #define MAX 100
 #define MIN -100
 
-
-
-
 double mutate( int arg, double val );
 void mainLoop( int arg1, double arg2, double arg3 );
-bool accept( double newf, double f, double temp );
+bool acceptFit( double newf, double f, double temp );
+double randDub( double min, double max );
 
 using namespace std;
+
+/*
+
+C++11 stuff
 
 random_device rd;
 mt19937 gen( rd() );
 uniform_real_distribution<double> dis( -0.1, 0.1 );
+*/
 
 int main( int argc, char* argv[] ) {
 
@@ -72,9 +76,10 @@ int main( int argc, char* argv[] ) {
 
   // testing
   initRand();
+  srand( time(0) );
   for( int i = 0; i < 100; i++ ) {
-    mainLoop( arg1, arg2, arg3 );
-  }
+     mainLoop( arg1, arg2, arg3 );
+   }
 
 }
 
@@ -83,64 +88,77 @@ int main( int argc, char* argv[] ) {
 // arg3 = cooling constant
 void mainLoop( int arg1, double arg2, double arg3 ){
   double x, y, nx, ny, bestFit, newFit, curFit, bestx, besty, rate;
-  int epoch, epochImproves;
+  double epoch, epochImproves;
+  int bestEval, totalMoves;
 
+  /*
   // init random number generator
   uniform_real_distribution<double> dis( MIN, MAX);
   random_device rd;
   mt19937 gen( rd() );
+  */
 
   // set x and y to random values
-  bestx = x = dis( gen );
-  besty = y = dis( gen );
+  bestx = x = randDub( MIN, MAX );
+  besty = y = randDub( MIN, MAX );
 
   // 200 runs before adjusting temp
-  epoch = 200;
+  epoch = 200.0;
 
   // calculate fitness here
   curFit = bestFit = fr( x, y );
-  
+
+  bestEval = totalMoves = 0;
   for( int i = 0; i < 100000; ) {
     // Number of improving moves in current epoch
     epochImproves = 0;
 
-    for( int j = 0; j < epoch; j++ ) {
+    for( int j = 0; j < 200; j++ ) {
       // get new values
       nx = mutate( arg1, x );
       ny = mutate( arg1, y );
-
+      while( nx > MAX || nx < MIN ) {
+	nx = mutate( arg1, x );
+      }
+      while( ny > MAX || ny < MIN ) {
+	ny = mutate( arg1, y );
+      }
+      
       // new fitness
       newFit = fr( nx, ny );
-
+       
       // new eval
       i++;
 
       // check if we accept new values
-      if( accept( newFit, curFit, arg2 ) ) {
+      if( acceptFit( newFit, curFit, arg2 ) ) {
+	totalMoves++;
 	epochImproves++;
 	x = nx;
 	y = ny;
 	curFit = newFit;
 	
 	if( curFit > bestFit ) {
+	  bestEval = i;
 	  bestx = x;
 	  besty = y;
 	  bestFit = curFit;
 	}
       }
     }
-    rate = epochImproves / epoch;
+    rate = (epochImproves / epoch);
     if( arg3 < 1 ) {
       if( rate > 0.9 ) arg2 *= arg3; // make it cooler
       if( rate < 0.1 ) arg2 /= arg3; // make it hotter
     }
   }
   // print results
-  cout << "Best Fitness: " << bestFit << endl;
+  cout << bestEval << " " << totalMoves << " "
+       << bestx << " " << besty << " " << bestFit << endl;
 }
 
-bool accept( double newf, double f, double temp ) {
-  return ( newf >= f ) || ( randUnit() < exp( (newf - f) / temp ) ); 
+bool acceptFit( double newf, double f, double temp ) {
+  return (( newf >= f ) || ( randUnit() < exp( (newf - f) / temp ) )); 
 }
  
 double mutate( int arg, double val ) {
@@ -148,7 +166,7 @@ double mutate( int arg, double val ) {
 
   switch( arg ) {
   case 0: {
-    nval = dis( gen );
+    nval = randDub(-0.1, 0.1);
     nval += val;
     return nval;
   }
@@ -167,4 +185,11 @@ double mutate( int arg, double val ) {
     exit( -1 );
   }
   }
+}
+
+double randDub( double min, double max ) {
+  double r = (double)rand() / (double)RAND_MAX;
+  return min + r * (max - min);
+
+  
 }

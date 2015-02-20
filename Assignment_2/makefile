@@ -5,7 +5,7 @@ SRC= rand.cpp bitHelpers.cpp localsearch.cpp mapFunctions.cpp func.cpp makefile 
 HDRS= rand.h bitHelpers.h mapFunctions.h func.h
 LIBS= -lm
 CC=g++
-CFLAGS= -o
+CFLAGS= -o 
 PFLAGS= -g -c -O3
 
 
