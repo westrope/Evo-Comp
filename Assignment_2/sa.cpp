@@ -1,4 +1,4 @@
-/* localsearch.cpp
+/* sa.cpp
 
    Ian Westrope
    Evolutionary Computation
@@ -190,6 +190,4 @@ double mutate( int arg, double val ) {
 double randDub( double min, double max ) {
   double r = (double)rand() / (double)RAND_MAX;
   return min + r * (max - min);
-
-  
 }
