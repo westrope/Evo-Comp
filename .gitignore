@@ -4,3 +4,6 @@ localsearch
 sa
 *.tar
 *.pdf
+*.log
+*.aux
+*.bak
