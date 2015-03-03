@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <vector>
+#include <bitset>
 
 #include "rand.h"
 
@@ -26,7 +27,7 @@ int main( int argc, char* argv[] ) {
 
   int numGenerations = atoi( argv[1] );
   int popSize = atoi( argv[2] );
-  double mutateProb = atof( argv[3] );
+  double xoverProb = atof( argv[3] );
 
 
   vector<unsigned long long int> population;
@@ -41,14 +42,13 @@ int main( int argc, char* argv[] ) {
   }
 
   initRand();
-  mask = (1<<k) -1;
+  mask = (1<<(k+1)) -1;
   
   for( int i = 0; i < popSize; i++ ) {
     tmp1 = randULL();
     tmp1 = tmp1 & mask;
     population.push_back(tmp1);
   }
-
 
   for( int i = 0; i < numGenerations; i++ ) {
 
@@ -60,7 +60,7 @@ int main( int argc, char* argv[] ) {
 	tmp2 = fit;
 	e2 = j;
       }
-      else if( fit > tmp1 && fit > tmp2 && tm1 <= tmp2) {
+      else if( fit > tmp1 && fit > tmp2 && tmp1 <= tmp2) {
 	tmp1 = fit;
 	e1 = j;
       }
@@ -80,7 +80,7 @@ int main( int argc, char* argv[] ) {
     
     // randomly select 3 and put them in a tourny and put winner in new population until it is full
     int rand1, rand2, rand3;
-    for( int k = 2; k < popSize; k++ ){
+    for( int j = 2; j < popSize; j++ ){
       rand1 = randMod( popSize );
       rand2 = randMod( popSize );
       rand3 = randMod( popSize );
@@ -88,11 +88,42 @@ int main( int argc, char* argv[] ) {
     }
 
     // pick 2 from new population and xover into population until pop is full with new
-
+    int j = 2;
+    while( j < popSize ) {
+      rand1 = randMod( popSize );
+      rand2 = randMod( popSize );
+      if( choose(xoverProb) ) {
+	population[j] = xover( newpopulation[rand1], newpopulation[rand2] );
+	j++;
+      }
+    }
     
     // mutate pop
-    // put new 
+    for( int j = 2; j > popSize; j++ ) {
+      population[j] = mutate( population[j] );
+    }
+
+    population[0] = newpopulation[0];
+    population[1] = newpopulation[1];
     
+  }
+
+  int bestFit, best;
+  best = 0;
+  bestFit = fitness( population[0] );
+  for( int i = 1; i < popSize; i++ ) {
+    if( fitness( population[i] ) > bestFit ) {
+      bestFit = fitness(population[i]);
+      best = i;
+    }
+  }
+
+  cout << bestFit << " " << (bitset<64>) population[best] << endl;
+  if( bestFit == c ) {
+    cout << "Satisfiable" << endl;
+  }
+  else {
+    cout << "Could not find a solution" << endl;
   }
   
 }

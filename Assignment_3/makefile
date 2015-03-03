@@ -23,5 +23,5 @@ clean:
 	rm -f *.o *~
 
 tar:
-	tar -cvf pas1.tar $(SRC) $(HDRS)
+	tar -cvf pas3.tar $(SRC) $(HDRS)
 	ls -l pas3.tar
