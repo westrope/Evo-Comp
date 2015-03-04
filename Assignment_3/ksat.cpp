@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <vector>
 #include <bitset>
+#include <cstring>
 
 #include "rand.h"
 
