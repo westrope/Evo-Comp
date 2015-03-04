@@ -12,14 +12,18 @@ vector<unsigned long long int> nMask;
 int n , k , c;
 
 unsigned long long int tourn( unsigned long long int a, unsigned long long int b,
-			      unsigned long long int c );
+			      unsigned long long int d );
 
-int fitness( unsigned long long int c );
+int fitness( unsigned long long int d );
 unsigned long long int xover( unsigned long long int a, unsigned long long int b );
 unsigned long long int mutate( unsigned long long int a );
+int convert( char *binary );
+
+
 
 int main( int argc, char* argv[] ) {
-
+  initRand();
+  
   if( argc != 4 ) {
     cout << "Three arguments required" << endl;
     exit ( -1 );
@@ -35,14 +39,17 @@ int main( int argc, char* argv[] ) {
   cin >> n >> k >> c;
 
   unsigned long long int tmp1, tmp2, mask;
+  char one[64];
+  char two[64];
   for( int i = 0; i < c; i++ ) {
-    cin >> tmp1 >> tmp2;
+    cin >> one >> two;
+    tmp1 = convert( one );
+    tmp2 = convert( two );
     clause.push_back(tmp1);
     nMask.push_back(tmp2);
   }
 
-  initRand();
-  mask = (1<<(k+1)) -1;
+   mask = (1<<(n)) -1;
   
   for( int i = 0; i < popSize; i++ ) {
     tmp1 = randULL();
@@ -88,18 +95,29 @@ int main( int argc, char* argv[] ) {
     }
 
     // pick 2 from new population and xover into population until pop is full with new
-    int j = 2;
-    while( j < popSize ) {
+    int h = 2;
+    while( h < popSize ) {
       rand1 = randMod( popSize );
       rand2 = randMod( popSize );
       if( choose(xoverProb) ) {
-	population[j] = xover( newpopulation[rand1], newpopulation[rand2] );
-	j++;
+	population[h] = xover( newpopulation[rand1], newpopulation[rand2] );
+	h++;
       }
+      /*
+      else {
+	population[h] = newpopulation[rand1];
+	h++;
+	if( h < popSize ) {
+	  population[h] = newpopulation[rand2];
+	}
+	h++;
+      }
+      */
     }
     
     // mutate pop
-    for( int j = 2; j > popSize; j++ ) {
+
+    for( int j = 2; j < popSize; j++ ) {
       population[j] = mutate( population[j] );
     }
 
@@ -128,46 +146,63 @@ int main( int argc, char* argv[] ) {
   
 }
 
+int convert( char *binary ) {
+  int p = 1, num = 0, tmp;
+  for (int i = strlen(binary)-1; i >= 0; i-- ) {
+    tmp = binary[i] - '0';
+    if( tmp == 1 ){
+      num = num + p;
+    }
+    p = p * 2;
+  
+  }
+  return num;
+}
+
 unsigned long long int mutate( unsigned long long int a ){
-  a = a ^ ( ((randULL() & randULL()) & randULL()) & randULL() );
-  return a;
+  unsigned long long int mask;
+  mask = a ^ ( ((randULL() & randULL()) & randULL()) & randULL() );
+  return mask;
 }
 
 unsigned long long int xover( unsigned long long int a, unsigned long long int b ) {
   unsigned long long int mask, child, mask2;
-  
-  for( int i = 1; i <= n; i++ ) {
-    mask = (1<<i) - 1;
-    if( choose( .5 ) ) {
-      mask2 = a & mask;
+  int count = 1;
+
+  for( int i = 0; i < n; i++ ) {
+    if( choose( 0.5 ) ) {
+      mask += count;
     }
-    else {
-      mask2 = b & mask;
+    else{
+      mask2 += count;
     }
+    count *= 2;
   }
-  return mask2;
-  
+  child = (a & mask) | (b & mask2);
+
+  return child;
+
 }
 
 unsigned long long int tourn( unsigned long long int a, unsigned long long int b,
-			      unsigned long long int c ) {
+			      unsigned long long int d ) {
   int fit1, fit2, fit3;
 
   fit1 = fitness( a );
   fit2 = fitness( b );
-  fit3 = fitness( c );
+  fit3 = fitness( d );
 
   if( fit1 >= fit2 && fit1 >= fit3 ) { return a; }
   if( fit2 >= fit1 && fit2 >= fit3 ) { return b; }
-  if( fit3 >= fit2 && fit3 >= fit1 ) { return c; }
+  if( fit3 >= fit2 && fit3 >= fit1 ) { return d; }
  
 }
 
-int fitness( unsigned long long int c ){
+int fitness( unsigned long long int d ){
   int fit = 0;
 
   for( int i = 0; i < clause.size(); i++ ) {
-    if( ((c & clause[i]) ^ nMask[i]) != 0 ) {
+    if( ((d & clause[i]) ^ nMask[i]) > 0 ) {
       fit++;
     }
   }
