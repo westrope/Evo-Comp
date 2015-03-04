@@ -104,7 +104,6 @@ int main( int argc, char* argv[] ) {
 	population[h] = xover( newpopulation[rand1], newpopulation[rand2] );
 	h++;
       }
-      /*
       else {
 	population[h] = newpopulation[rand1];
 	h++;
@@ -113,7 +112,6 @@ int main( int argc, char* argv[] ) {
 	}
 	h++;
       }
-      */
     }
     
     // mutate pop
