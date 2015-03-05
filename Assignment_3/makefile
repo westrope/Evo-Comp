@@ -13,8 +13,8 @@ PFLAGS= -g -c -O3
 ksat: ksat.o rand.o
 	$(CC) $(CFLAGS) ksat ksat.o rand.o
 
-localsearch.o: localsearch.cpp
-	$(CC) $(PFLAGS) localsearch.cpp 
+ksat.o: ksat.cpp rand.h
+	$(CC) $(PFLAGS) -std=c++0x ksat.cpp 
 
 rand.o: rand.cpp rand.h
 	$(CC) $(PFLAGS) rand.cpp 

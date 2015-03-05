@@ -3,6 +3,7 @@
 #include <vector>
 #include <bitset>
 #include <cstring>
+#include <string>
 
 #include "rand.h"
 
@@ -18,7 +19,7 @@ unsigned long long int tourn( unsigned long long int a, unsigned long long int b
 int fitness( unsigned long long int d );
 unsigned long long int xover( unsigned long long int a, unsigned long long int b );
 unsigned long long int mutate( unsigned long long int a );
-int convert( char *binary );
+unsigned long long int convert( char *binary );
 
 
 
@@ -44,11 +45,17 @@ int main( int argc, char* argv[] ) {
   char two[64];
   for( int i = 0; i < c; i++ ) {
     cin >> one >> two;
-    tmp1 = convert( one );
-    tmp2 = convert( two );
+    tmp1 = stoull(one, 0, 2);
+    tmp2 = stoull(two, 0, 2);    
     clause.push_back(tmp1);
     nMask.push_back(tmp2);
   }
+  /*
+  for( int i = 0; i < c; i++) {
+    cout << (bitset<64>)clause[i] << endl;
+    cout << (bitset<64>)nMask[i] << endl;
+  }
+  */
 
    mask = (1<<(n)) -1;
   
@@ -145,40 +152,40 @@ int main( int argc, char* argv[] ) {
   
 }
 
-int convert( char *binary ) {
-  int p = 1, num = 0, tmp;
-  for (int i = strlen(binary)-1; i >= 0; i-- ) {
-    tmp = binary[i] - '0';
-    if( tmp == 1 ){
-      num = num + p;
+unsigned long long int convert( char *binary ) {
+  unsigned long long int p = (1<<0), num = 0;
+  char  tmp;
+  int count = 1;
+  for (int i = strlen(binary) -1; i >=  0; i-- ) {
+    tmp = binary[i];
+    if( tmp == '1' ){
+      num = (num | (1<<i));
     }
-    p = p * 2;
-  
+    //    p = (1<<);
+    //count++;
   }
   return num;
 }
 
 unsigned long long int mutate( unsigned long long int a ){
   unsigned long long int mask;
-  mask = a ^ ( ((randULL() & randULL()) & randULL()) & randULL() );
+   mask = a ^ ( ((randULL() & randULL()) & randULL()) & randULL() );
   return mask;
 }
 
 unsigned long long int xover( unsigned long long int a, unsigned long long int b ) {
-  unsigned long long int mask, child, mask2;
-  int count = 1;
+  unsigned long long int mask, child, mask2, count = 1;
 
   for( int i = 0; i < n; i++ ) {
     if( choose( 0.5 ) ) {
-      mask += count;
+      mask = mask + count;
     }
     else{
-      mask2 += count;
+      mask2 = mask2 + count;
     }
-    count *= 2;
+    count = count * 2;
   }
   child = (a & mask) | (b & mask2);
-
   return child;
 
 }
@@ -200,7 +207,7 @@ unsigned long long int tourn( unsigned long long int a, unsigned long long int b
 int fitness( unsigned long long int d ){
   int fit = 0;
 
-  for( int i = 0; i < clause.size(); i++ ) {
+  for( int i = 0; i < c; i++ ) {
     if( ((d & clause[i]) ^ nMask[i]) > 0 ) {
       fit++;
     }
