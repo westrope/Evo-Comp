@@ -17,7 +17,7 @@ unsigned long long int tourn( unsigned long long int a, unsigned long long int b
 			      unsigned long long int d );
 
 int fitness( unsigned long long int d );
-unsigned long long int xover( unsigned long long int a, unsigned long long int b );
+void xover( unsigned long long int &a, unsigned long long int &b );
 unsigned long long int mutate( unsigned long long int a );
 unsigned long long int convert( char *binary );
 
@@ -104,12 +104,21 @@ int main( int argc, char* argv[] ) {
 
     // pick 2 from new population and xover into population until pop is full with new
     int h = 2;
+    unsigned long long int a , b;
     while( h < popSize ) {
       rand1 = randMod( popSize );
       rand2 = randMod( popSize );
       if( choose(xoverProb) ) {
-	population[h] = xover( newpopulation[rand1], newpopulation[rand2] );
+	a = newpopulation[rand1];
+	b = newpopulation[rand2];
+	xover( a, b );
+	population[h] = a;
 	h++;
+	if( h < popSize ) {
+	  population[h] = b;
+	  h++;
+	}
+
       }
       else {
 	population[h] = newpopulation[rand1];
@@ -173,9 +182,18 @@ unsigned long long int mutate( unsigned long long int a ){
   return mask;
 }
 
-unsigned long long int xover( unsigned long long int a, unsigned long long int b ) {
-  unsigned long long int mask, child, mask2, count = 1;
+void xover( unsigned long long int &a, unsigned long long int &b ) {
+  unsigned long long int mask, child1, child2, mask2, count = 1;
 
+  mask = randULL();
+  child1 = (a & mask) | (b & ~mask);
+  child2 = (a & ~mask) | (b & mask);
+
+  a = child1;
+  b = child2;
+  
+  
+  /*  
   for( int i = 0; i < n; i++ ) {
     if( choose( 0.5 ) ) {
       mask = mask + count;
@@ -187,6 +205,7 @@ unsigned long long int xover( unsigned long long int a, unsigned long long int b
   }
   child = (a & mask) | (b & mask2);
   return child;
+  */
 
 }
 
