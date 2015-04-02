@@ -1,7 +1,7 @@
 # It is important to note that what looks like leading sets of blanks
 # are in fact tabs and MUST BE TABS.  Make is just that way.
 #
-SRC= rand.cpp maib.cpp makefile westrope.pdf freq.txt
+SRC= rand.cpp main.cpp makefile westrope.pdf freq.txt
 HDRS= rand.h
 LIBS= -lm
 CC=g++
