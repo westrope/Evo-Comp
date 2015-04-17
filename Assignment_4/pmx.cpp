@@ -139,7 +139,7 @@ void pmx(int *a, int *b, int *out, int k, int size)
 int main()
 {
     initRand();
-    const int size=9;
+    const int size=26;
     int a[size], b[size], out[size];
     
     // make up some random permuations
@@ -149,7 +149,7 @@ int main()
     for (int i=0; i<12; i++) {
         print((char *)"B", b, size);
         print((char *)"A", a, size);
-        pmx(a, b, out, 3, size);
+        pmx(a, b, out, 13, size);
         print((char *)"OUT", out, size);
         printf("\n");
         if (!isPermP(out, size)) {
