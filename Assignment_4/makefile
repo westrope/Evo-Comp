@@ -6,7 +6,7 @@ HDRS= rand.h
 LIBS= -lm
 CC=g++
 CFLAGS= -o
-PFLAGS= -g -c -O3
+PFLAGS= -c -O3
 
 
 
