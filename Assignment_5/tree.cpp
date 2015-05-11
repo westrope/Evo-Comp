@@ -81,7 +81,6 @@ void Tree::init()
     size_ = 1;
 }
 
-
 // this gets a single node 
 Tree *Tree::get(Op *op, double initValue=0.0)   // some ops assume an initial value!
 {

@@ -104,6 +104,9 @@ public:
                                 // THIS WILL NOT FREE THE SUBTREE
                                 // returns side removed from in parent
     Tree *pickNode();           // uniformly any node but the root
+
+    void mutate();              // mutate
+    void xover( int mindepth );               // crossover
 };
 
 void setX(double x);            // set the x variable
