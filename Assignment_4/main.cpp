@@ -6,35 +6,42 @@
 #include <string>
 #include <fstream>
 #include <cstdio>
+#include <complex>
 
 #include "rand.h"
 
 using namespace std;
 
-float fitness( int key[] );
-void translate ( int key[], char tmpkey[] );
-
-//char eng1[488], eng2[488], cipher1[488], cipher2[488];
-//float engnum[488], sum = 0;
-
-float sum = 0;
-float engfreq[27][27];
-float ciphertxt[27][27];
-string cipher, tmp;
-//float ciphernum[488];
-
 class individual {
 public:
   int key[26];
   float fit;
-  
 };
+
+float fitness( int key[] );
+void translate ( int key[], char tmpkey[] );
+void run();
+void shuffle(int *a, int size);
+void pmx(int *a, int *b, int *out, int k, int size);
+void  mutate( int * a );
+
+//globals
+float sum = 0;
+float engfreq[27][27];
+float ciphertxt[27][27];
+string cipher, tmp;
+//vector<population>population, newpopulation;
+int popSize = 100;
+int generations = 200;
+class individual population[100];
+class individual newpopulation[100];
 
 // user functions go here
 
 
 int main() {
 
+  initRand();
 
   // get cipher from cin
 
@@ -43,7 +50,7 @@ int main() {
   }
 
   // remove spaces from cipher
-  cipher.erase( remove( cipher.begin(), cipher.end(), ' ' ), cipher.end() );
+  //cipher.erase( remove( cipher.begin(), cipher.end(), ' ' ), cipher.end() );
 
   // read in freq.txt
   FILE *freq = fopen( "freq.txt", "r" );
@@ -143,6 +150,7 @@ int main() {
   for( int i = 1; i < 27; i++ ) {
     for( int j = 1; j < 27; j++ ) {
       engfreq[i][j] /= sum;
+      //      engfreq[i][j] *= 100;      
      }
   }
 
@@ -179,27 +187,194 @@ int main() {
   for( int i = 1; i < 27; i++ ) {
     for( int k = 1; k < 27; k++ ) {
       ciphertxt[i][k] /= sum;
+      //      ciphertxt[i][k] *= 100;      
     }
   }
 
+  run();
+  float bestFit, nbest;
+  int best;
+  best = 0;
+  bestFit = fitness(population[0].key);
+  for( int i = 1; i < popSize; i++ ) {
+    if( (nbest = fitness(population[i].key)) > bestFit ) {
+      bestFit = nbest;
+      best = i;
+    }
+  }
+
+  char charkey[26];
+  translate( population[best].key, charkey );
+  cout << bestFit << endl;
+  cout << "** westrope ";
+  for( int i = 0; i < 26; i++ ) {
+    cout << charkey[i];
+  }
+  cout << endl;
+
+
+ 
   //  osjpedqyvkrtznbhcgalmuifxw
 
-  int key[26] = {14,18,9,15,4,3,16,24,21,10,17,19,25,13,1,7,2,6,0,11,12,20,8,5,23,22 };
-  int fit = 0;
-  
-  fit = fitness( key );
-  cout << fit << endl;
+  //int key[26] = {14,18,9,15,4,3,16,24,21,10,17,19,25,13,1,7,2,6,0,11,12,20,8,5,23,22 };
+  //int fit = 0;
+
+  // fit = fitness( key );
+
+  //  cout << fit << endl;
  
 
 } // end main
+
+void run() {
+  for( int i = 0; i < popSize; i++ ) {
+    class individual ind;
+    shuffle( ind.key, 26 );
+    population[i] = ind;
+    newpopulation[i] = ind;
+  }
+
+  for( int i = 0; i < generations; i++ ) {
+     cout << i << endl;
+    // get elite
+    int e1 = 0, e2 = 0;
+    float tmp1 = 0, tmp2 = 0, fit;
+    
+    for( int j = 0; j < popSize; j++ ) {
+      population[j].fit = fitness(population[j].key);
+      if( population[j].fit > tmp1 && population[j].fit > tmp2 && tmp1 >= tmp2) {
+	tmp2 = population[j].fit;
+	e2 = j;
+      }
+      else if( population[j].fit > tmp1 && population[j].fit > tmp2 && tmp1 <= tmp2) {
+	tmp1 = population[j].fit;
+	e1 = j;
+      }
+      else if( population[j].fit > tmp1 ) {
+	tmp1 = population[j].fit;
+	e1 = j;
+      }
+      else if( population[j].fit > tmp2 ) {
+	tmp2 = population[j].fit;
+	e2 = j;
+      }
+    }
+    //   vector<population>newpopulation;
+    
+    newpopulation[0] = population[e1];
+    newpopulation[1] = population[e2];
+
+    // cout << "got elite" << endl;
+    // tournament selection  
+    int rand1, rand2, rand3; 
+    for( int j = 2; j < popSize; j++ ){
+      rand1 = randMod( popSize );
+      rand2 = randMod( popSize );
+      rand3 = randMod( popSize );
+      float fit1, fit2, fit3;
+      fit1 = population[rand1].fit;
+      fit2 = population[rand2].fit;
+      fit3 = population[rand3].fit;
+      if( fit1 >= fit2 && fit1 >= fit3 )
+	{
+	  newpopulation[j] = population[rand1];
+	  continue;
+	}
+      if( fit2 >= fit1 && fit2 >= fit3 )
+	{
+	  newpopulation[j] = population[rand2];
+	  continue;
+	}
+      if( fit3 >= fit2 && fit3 >= fit1 )
+	{
+	  newpopulation[j] = population[rand3];
+	  continue;
+	}	
+    }
+    //cout << "did a tournament" << endl;
+
+    // xover
+    int a[26], b[26], c[26], d[26];      
+    for( int k = 0; k < popSize - 1; k++ ) {
+      if( choose(0.9) ) {
+	pmx( newpopulation[k].key, newpopulation[k + 1].key, c, 8, 26 );
+	pmx( newpopulation[k+1].key, newpopulation[k].key, d, 8, 26 );
+	for( int h = 0; h < 26; h++ ) {
+	  population[k].key[h] = c[h];
+	  population[k+1].key[h] = d[h];
+	}
+      }else{
+	population[k] = newpopulation[k];
+	population[k+1] = newpopulation[k+1];
+      }
+    }
+    /*
+    int h = 2;
+    while( h < popSize - 1 ) {
+
+      if( choose(0.9) ) {
+	pmx( newpopulation[h].key, newpopulation[h + 1].key, c, 8, 26 );
+	pmx( newpopulation[h+1].key, newpopulation[h].key, d, 8, 26 );
+	for( int k = 0; k < 26; k++ ) {
+	  population[h].key[k] = c[k];
+	}
+	h++;
+	if( h < popSize ) {
+	  for( int k = 0; k < 26; k++ ) {
+	    population[h].key[k] = d[k];
+	  }	
+	  h++;
+	}
+      }
+      else{
+	population[h] = newpopulation[rand1];
+	h++;
+	if( h < popSize ) {
+	  population[h] = newpopulation[rand2];
+	  h++;
+	}
+      }
+    }
+    */
+    cout << "xover is done" << endl;
+    
+    // mutate
+    for( int k = 2; k < popSize; k++ ){
+      mutate( population[k].key );
+    }
+
+    // copy over elite
+    population[0] = newpopulation[0];
+    population[1] = newpopulation[1];
+
+  }// main loop
+  
+}// end run
 
 
 float fitness( int key[] ) {
   // translate key
   char tmpkey[26];
   translate( key, tmpkey );
-  float fit = 0;
+  float fit = 0, tm3 = 0, tm4;
+  string tmpcip = cipher;
+  int place = 0;
+  char lookup[26] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+  // translate cipher
+  for( int i = 0; i < cipher.size() -1; i++ ) {
+    for( int j = 0; j < 26; j++ ) {
+      if( cipher[i] == tmpkey[j] ) {
+	tmpcip[i] = lookup[j];
+	break;
+      }
+    }
+  }
 
+  //  for( int i = 0; i < tmpcip.size(); i++ ) {
+  //  cout << tmpcip[i];
+  //}
+  //cout << endl;
+  
   // translate the sides of ciphertxt
   for( int i = 1; i < 27; i++ ) {
     ciphertxt[0][i] = tmpkey[i - 1];
@@ -208,35 +383,33 @@ float fitness( int key[] ) {
 
   int cip1 = 0, cip2 = 0, eng1 = 0, eng2 = 0;
   float tmp1, tmp2;
-  for( int i = 0; i < cipher.size() - 1; i++ ) {
-    tmp1 = cipher[i];
-    tmp2 = cipher[i+1];
+  for( int i = 0; i < tmpcip.size() - 1; i++ ) {
+    tmp1 = tmpcip[i];
+    tmp2 = tmpcip[i+1];
     for( int j = 1; j < 27; j++ ) {
        if( tmp1 == engfreq[j][0] ) {
 	eng1 = j;
       }
+       if( tmp1 == ciphertxt[j][0] ) {
+	 cip1 = j;
+       }
+       if( tmp2 == engfreq[0][j] ) {
+	 eng2 = j;
+       }
+       if( tmp2 == ciphertxt[0][j] ) {
+	 cip2 = j;
+       }
     }
-    for( int j = 1; j < 27; j++ ) {
-      if( tmp2 == engfreq[0][j] ) {
-	eng2 = j;
-      }
+    if( engfreq[eng1][eng2] == 0 ) {
+      tm4 = -0.0009;
     }
-    for( int j = 1; j < 27; j++ ) {
-      if( tmp1 == ciphertxt[j][0] ) {
-	cip1 = j;
-      }
+    else {
+      tm3 = ( engfreq[eng1][eng2] * ciphertxt[cip1][cip2] );
+      tm4 = sqrt(tm3);      
     }
-    for( int j = 1; j < 27; j++ ) {
-      if( tmp2 == ciphertxt[0][j] ) {
-	cip2 = j;
-      }
-    }
-    fit += ( engfreq[eng1][eng2] * ciphertxt[cip1][cip2] );
-    
-  }
+    fit += tm4;
 
-  fit *= fit;
-  fit = ( 1.0 / fit );
+  }
 
   return fit;
 
@@ -325,8 +498,100 @@ void translate ( int key[], char tmpkey[] ) {
       tmpkey[i] = 'z';
       break;
     default:
+      cout << "why are you here?" << endl;
       break;
     }
   }
 
+}
+
+// uniform pmx xover
+void pmx(int a[], int b[], int out[], int k, int size) 
+{
+    bool pick[size];   // which elements to copy from B
+    int locA[size];    // locA[x] is where is x in A
+    int locB[size];    // locB[x] is where is x in B
+    const double prob = (double)k/size;
+
+    for(int i = 0; i < size; i++ ){
+      out[i] = 0;
+    }
+
+    // copy random subset of B
+    for (int i=0; i<size; i++) {
+        // choose 
+        if (choose(prob)) {
+            pick[i] = true;        // select what to copy from B
+            out[i] = b[i];         // copy from B
+        }
+        else {
+            pick[i] = false;       
+            out[i] = -1;           // if not copied from B then mark -1
+        }
+
+        // make table as a side effect
+        locA[a[i]] = locB[b[i]] = i;   // set up location lookup for A and B
+    }
+    // ASSERT: out[i] is either from B or -1.  pick[i]=T if B
+
+    // print for to use as example
+    //  printf("%4s", "PICK");
+    //    for (int i=0; i<size; i++) //printf("%2s ", (pick[i] ? "*" : " "));
+    //printf("\n");
+
+    // copy the lost elements into the duplicate elements
+    for (int i=0; i<size; i++) {
+        // for each location in the child where an element from B was put 
+        // was the element from A that could have been put there also
+        if (pick[i] && !pick[locB[a[i]]]) {
+            // a[i] was an element that was not picked so we need to put it
+            // somewhere
+            int loc;
+
+            // find duplicate
+            loc = i;
+            do {
+                loc = locA[b[loc]];
+            }
+            while (out[loc] != -1);
+
+            out[loc] = a[i];  // copy lost element over duplicate
+        }
+    }
+
+    // copy from A anything not already copied
+    for (int i=0; i<size; i++) {
+        if (out[i] == -1) out[i] = a[i];
+    }
+}  
+
+void shuffle(int a[], int size)
+{
+    for (int i=0; i<size; i++) {
+        a[i] = i;
+    }
+
+    for (int i=size-1; i>0; i--) {
+        int tmp1, j;
+
+        j = randMod(i+1);
+        tmp1 = a[i];
+        a[i] = a[j];
+        a[j] = tmp1;
+    }
+}
+
+void  mutate( int  a[] ) {
+  int rand1, rand2, rand3, tmp1, tmp2, tmp3;
+  rand1 = randMod(26);
+  rand2 = randMod(26);
+  rand3 = randMod(26);
+
+  tmp1 = a[rand1];
+  tmp2 = a[rand2];
+  tmp3 = a[rand3];
+
+  a[rand1] = tmp3;
+  a[rand2] = tmp1;
+  a[rand3] = tmp2;
 }
