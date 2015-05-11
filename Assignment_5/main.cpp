@@ -1,5 +1,6 @@
 #include <iostream>
 
+
 #include "rand.h"
 #include "tree.h"
 
@@ -7,6 +8,15 @@ using namespace std;
 
 void xover( int mindepth, Tree *t );
 double fitness();
+
+//globals
+double input[51];
+double output[51];
+int numPoints;
+
+int popsize = 1000;
+int generations = 50;
+int treeDepth = 7;
 
 int main()
 {
@@ -23,7 +33,35 @@ int main()
 
 
   // read in from cin here into global varabiables
+  float in, out;
+  cin >> numPoints;
+  for( int i = 0; i < numPoints; i++ )
+    {
+      scanf( "%f %f", &in, &out );
+      input[i] = in;
+      output[i] = out;
+      cout << input[i] << " " << output[i] << endl;
+    }
+  
   // init array of tree pointers here
+  Tree *population[popsize];
+
+  // init array with half randTrees half FullTrees
+  int s = 1;
+  for(int i = 0; i < popsize; i++)
+    {
+      if( s == 1 )
+	{
+	  population[i] = Tree::getRandTree(treeDepth);
+	  s = 0;
+	}
+      else
+	{
+	  population[i] = Tree::getRandFullTree(treeDepth);
+	  s = 1;
+	}
+    }
+  
   // run rest of program here
   
   Tree *test;
