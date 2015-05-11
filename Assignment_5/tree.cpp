@@ -79,6 +79,7 @@ void Tree::init()
     used_ = false;
     value_ = 0.0;
     size_ = 1;
+    fit_ = 100;
 }
 
 // this gets a single node 
@@ -399,6 +400,11 @@ Tree *Tree::up()
 double Tree::value()
 {
     return value_;
+}
+
+double Tree::fit()
+{
+  return fit_;
 }
 
 

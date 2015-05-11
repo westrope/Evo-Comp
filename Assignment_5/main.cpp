@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void xover( int mindepth, Tree *t );
+Tree * xover( int mindepth, Tree *t );
 double fitness();
 
 //globals
@@ -17,6 +17,8 @@ int numPoints;
 int popsize = 1000;
 int generations = 50;
 int treeDepth = 7;
+
+double probXover = 0.5;
 
 int main()
 {
@@ -40,7 +42,7 @@ int main()
       scanf( "%f %f", &in, &out );
       input[i] = in;
       output[i] = out;
-      cout << input[i] << " " << output[i] << endl;
+      //      cout << input[i] << " " << output[i] << endl;
     }
   
   // init array of tree pointers here
@@ -60,17 +62,36 @@ int main()
 	  population[i] = Tree::getRandFullTree(treeDepth);
 	  s = 1;
 	}
+      // set fitness of each tree here
+    }
+
+  // run rest of program here
+  for( int i = 0; i < generations; i++ )
+    {
+      for( int k = 0; k < popsize; k++ )
+	{
+	  if( choose(probXover) )	  // xover if true
+	    {
+	      // xover
+	      // run tournament to see if it goes into pop
+	    }
+	  else                            // else mutate
+	    {
+	      // mutate
+	      // run tournament to see if it goes into pop
+	    }
+	}
     }
   
-  // run rest of program here
-  
-  Tree *test;
+  Tree *test, *c, *n;
 
   test = Tree::getRandTree(5);
   test->check();
   test->print();
-  xover(2, test);
-  test->print();
+  test->eval();
+  c = test->copy();
+  n = xover(4, test);
+  n->print();
   
   
   /*
@@ -106,12 +127,13 @@ double fitness()
 // doubles as mutation by changing size of depth!
 // mindepth is the maxsize of subtree to be placed in
 // could add another parameter to make a min size of tree to be placed in as well...
-void xover( int mindepth, Tree *t )
+Tree * xover( int mindepth, Tree *f )
 {
-  Tree *parent, *s;
+  Tree *parent, *s, *t;
   Side side;
   int depth;
-
+  
+  t = f->copy();
   s = t->pickNode();
   while( mindepth < s->depth() )
     {
@@ -125,5 +147,7 @@ void xover( int mindepth, Tree *t )
   s = Tree::getRandTree(depth);
   parent->join(side, s);
   t->check();
+
+  return t;
   
 }

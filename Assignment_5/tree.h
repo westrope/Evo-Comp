@@ -57,6 +57,7 @@ private:
     double value_; // the cached value for this node (value if terminal)
     int size_;     // size of the tree beneath this node including this node
     bool used_;    // is the node allocated (provides debugging support)
+    double fit_;    // fitness of tree
 
 // class variables
 private:
@@ -94,6 +95,7 @@ public:
     bool isOp();                // true if operator
     Tree *up();                 // parent accessor
     double value();             // value accessor
+    double fit();               // tree fitness
     double eval();              // evaluate the tree
     double evalUp();            // evaluate by going from this node up
     void printIndent(int depth=0);  // print internal form of tree
@@ -104,9 +106,6 @@ public:
                                 // THIS WILL NOT FREE THE SUBTREE
                                 // returns side removed from in parent
     Tree *pickNode();           // uniformly any node but the root
-
-    void mutate();              // mutate
-    void xover( int mindepth );               // crossover
 };
 
 void setX(double x);            // set the x variable
